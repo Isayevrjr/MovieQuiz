@@ -1,8 +1,7 @@
-//
-//  QuizQuestion.swift
-//  MovieQuiz
-//
-//  Created by IR on 22.04.2024.
-//
+import UIKit
 
-import Foundation
+struct QuizQuestion {
+    let image: String
+    let text: String
+    let correctAnswer: Bool
+}
