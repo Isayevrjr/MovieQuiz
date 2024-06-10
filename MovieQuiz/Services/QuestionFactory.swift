@@ -28,6 +28,7 @@ class QuestionFactory: QuestionFactoryProtocol {
             }
         }
     } 
+   
 
     func requestNextQuestion() {
         DispatchQueue.global().async { [weak self] in
@@ -57,7 +58,6 @@ class QuestionFactory: QuestionFactoryProtocol {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.delegate?.didReceiveNextQuestion(question: question)
-                guard let delegate = delegate else { return }
             }
         }
     }
