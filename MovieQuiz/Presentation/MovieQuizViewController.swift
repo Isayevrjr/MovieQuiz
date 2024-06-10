@@ -2,6 +2,7 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterProtocol {
     
+    
     //MARK: - Аутлеты
     
     @IBOutlet private var imageView: UIImageView!
@@ -9,6 +10,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private var yesButton: UIButton!
     @IBOutlet private var noButton: UIButton!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     // MARK: - Lifecycle
     
@@ -28,13 +30,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        statisticService = StatisticService()
-        
-        let questionFactory = QuestionFactory()
-        questionFactory.delegate = self
-        self.questionFactory = questionFactory
-        
-        questionFactory.requestNextQuestion()
+        imageView.layer.cornerRadius = 20
+            questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+            statisticService = StatisticService()
+
+            showLoadingIndicator()
+            questionFactory?.loadData()
         
         let alertDelegate = AlertPresenter()
         alertDelegate.alertController = self
@@ -60,12 +61,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     // MARK: - Private functions
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let questionStep = QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+        return QuizStepViewModel(
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionAmount)")
-        
-        return questionStep
     }
     
     private func show(quiz step: QuizStepViewModel) {
@@ -147,6 +146,45 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private func noBorder() {
         imageView.layer.borderWidth = 0
     }
+    
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+    }
+    
+    private func hideLoadingIndicator() {
+        activityIndicator.isHidden = true
+        activityIndicator.stopAnimating()
+    }
+    
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true // скрываем индикатор загрузки
+          questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
+    }
+    
+    
+    private func showNetworkError(message: String) {
+        hideLoadingIndicator()
+        
+        let model = AlertModel(
+            title: "Ошибка!",
+            message: message,
+            buttonText: "Попробовать еще раз") { [weak self] in
+                guard let self = self else { return }
+                
+                self.currentQuestionIndex = 0
+                self.correctAnswers = 0
+                
+                self.questionFactory?.requestNextQuestion()
+            }
+        
+        alertDelegate?.show(alertModel: model)
+    
+    }
 
     //MARK: - Кнопки
     
@@ -157,7 +195,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         let givenAnswer = true
         
         yesButton.isEnabled = false
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnwer)
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
         
     }
     
@@ -168,6 +206,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         let givenAnswer = false
         
         noButton.isEnabled = false
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnwer)
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
 }
