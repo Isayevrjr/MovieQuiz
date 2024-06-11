@@ -31,15 +31,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     override func viewDidLoad() {
         super.viewDidLoad()
         imageView.layer.cornerRadius = 20
-            questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
-            statisticService = StatisticService()
-
-            showLoadingIndicator()
-            questionFactory?.loadData()
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        statisticService = StatisticService()
+        
+        showLoadingIndicator()
+        questionFactory?.loadData()
         
         let alertDelegate = AlertPresenter()
         alertDelegate.alertController = self
         self.alertDelegate = alertDelegate
+        
         
     }
     
@@ -81,7 +82,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        imageView.layer.cornerRadius = 6
         
         // запускаем задачу через 1 секунду c помощью диспетчера задач
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
