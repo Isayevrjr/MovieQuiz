@@ -108,11 +108,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
 Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? ""))%
 """
                 let alertModel = AlertModel(
-                    title: "Этот раунд закончен",
+                    title: "Этот раунд окончен!",
                     message: text,
                     buttonText: "Сыграть еще раз",
                     completion: {
-                        self.currentQuestionIndex = 1
+                        self.currentQuestionIndex = 0
                         self.correctAnswers = 0
                         self.questionFactory?.requestNextQuestion()
                     })
