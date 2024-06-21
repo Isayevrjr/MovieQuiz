@@ -18,8 +18,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         return .lightContent
     }
     private var correctAnswers = 0
+    var currentQuestion: QuizQuestion?
     private var questionFactory: QuestionFactoryProtocol?
-    private var currentQuestion: QuizQuestion?
     private var alertDelegate: MovieQuizViewControllerDelelegate?
     private var statisticService: StatisticServiceProtocol?
     private let presenter = MovieQuizPresenter()
@@ -40,6 +40,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         alertDelegate.alertController = self
         self.alertDelegate = alertDelegate
         
+        presenter.viewController = self
         
     }
     
@@ -58,17 +59,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
     }
     
-    // MARK: - Private functions
+    // MARK: - showAnswerResult
     
-
-    
-    private func show(quiz step: QuizStepViewModel) {
-        imageView.image = step.image
-        textLabel.text = step.question
-        counterLabel.text = step.questionNumber
-    }
-    
-    private func showAnswerResult(isCorrect: Bool) {
+    func showAnswerResult(isCorrect: Bool) {
         
         if isCorrect {
             correctAnswers += 1
@@ -89,6 +82,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         }
     }
     
+    // MARK: - Private functions
+    
+
+    
+    private func show(quiz step: QuizStepViewModel) {
+        imageView.image = step.image
+        textLabel.text = step.question
+        counterLabel.text = step.questionNumber
+    }
  
     //метод, который содержит логику перехода в один из сценариев
     func showNextQuestionOrResults() {
@@ -183,23 +185,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     //MARK: - Кнопки
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
-        guard let currentQuestion else {
-            return
-        }
-        let givenAnswer = true
-        
-        yesButton.isEnabled = false
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-        
+        presenter.currentQuestion = currentQuestion
+        presenter.yesButtonClicked()
     }
     
     @IBAction private func noButtonClicked(_ sender: Any) {
-        guard let currentQuestion else {
-            return
-        }
-        let givenAnswer = false
-        
-        noButton.isEnabled = false
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        presenter.currentQuestion = currentQuestion
+        presenter.noButtonClicked()
     }
 }
