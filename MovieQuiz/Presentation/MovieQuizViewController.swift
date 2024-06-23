@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertPresenterProtocol {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     
     //MARK: - Аутлеты
@@ -22,6 +22,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     private var alertDelegate: MovieQuizViewControllerDelelegate?
     private var statisticService: StatisticServiceProtocol?
     private let presenter = MovieQuizPresenter()
+    
+    let alertPresenter = AlertPresenter()
 
 
     // MARK: - viewDidLoad
@@ -34,10 +36,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         
         showLoadingIndicator()
         questionFactory?.loadData()
-        
-        let alertDelegate = AlertPresenter()
-        alertDelegate.alertController = self
-        self.alertDelegate = alertDelegate
         
         presenter.viewController = self
         
@@ -98,7 +96,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
                         self.correctAnswers = 0
                         self.questionFactory?.requestNextQuestion()
                     })
-                alertDelegate?.show(alertModel: alertModel)
+                alertPresenter.show(in: self, model: alertModel)
                 correctAnswers = 0
             } else {
                 presenter.switchToNextQuestion()
@@ -166,8 +164,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
                 self.questionFactory?.requestNextQuestion()
             }
         
-        alertDelegate?.show(alertModel: model)
-    
+        alertPresenter.show(in: self, model: model)
     }
 
     //MARK: - Кнопки
