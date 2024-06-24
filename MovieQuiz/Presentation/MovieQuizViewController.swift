@@ -18,10 +18,10 @@ final class MovieQuizViewController: UIViewController {
         return .lightContent
     }
     
-    private var alertDelegate: MovieQuizViewControllerDelelegate?
+    
     
     private var presenter: MovieQuizPresenter!
-
+    private var alertDelegate: MovieQuizViewControllerDelelegate?
     let alertPresenter = AlertPresenter()
 
 
@@ -41,25 +41,11 @@ final class MovieQuizViewController: UIViewController {
     
     // MARK: - internal
     
-    
-    func showAnswerResult(isCorrect: Bool) {
-        presenter.didAnswer(isCorrectAnswer: isCorrect)
-        
+    func highlightImageBorder(isCorrectAnswer: Bool) {
+        imageView.layer.borderColor = UIColor.clear.cgColor
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        
-        // запускаем задачу через 1 секунду c помощью диспетчера задач
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else {return}
-            
-           // код, который мы хотим вызвать через 1 секунду
-            //self.presenter.questionFactory = self.questionFactory
-            self.presenter.showNextQuestionOrResults()
-            self.noBorder()
-            self.yesButton.isEnabled = true
-            self.noButton.isEnabled = true
-        }
+        imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
     }
     
     
@@ -75,7 +61,7 @@ final class MovieQuizViewController: UIViewController {
     private func show(quiz result: QuizResultViewModel) {
         let alert = UIAlertController (
             title: result.title,
-            message: result.text,
+            message: presenter.makeResultsMessage(),
             preferredStyle: .alert)
         
         let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
@@ -88,7 +74,7 @@ final class MovieQuizViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    private func noBorder() {
+    func noBorder() {
         imageView.layer.borderWidth = 0
     }
     
@@ -128,14 +114,12 @@ final class MovieQuizViewController: UIViewController {
     //MARK: - Кнопки
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
-        yesButton.isEnabled = false
-        noButton.isEnabled = false
+        
         presenter.yesButtonClicked()
     }
     
     @IBAction private func noButtonClicked(_ sender: Any) {
-        yesButton.isEnabled = false
-        noButton.isEnabled = false
+     
         presenter.noButtonClicked()
     }
 }
