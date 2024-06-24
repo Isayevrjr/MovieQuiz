@@ -12,20 +12,16 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var noButton: UIButton!
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
-    // MARK: - Lifecycle
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
-    
-    
     private var presenter: MovieQuizPresenter!
     private var alertDelegate: MovieQuizViewControllerDelelegate?
-    let alertPresenter = AlertPresenter()
-
-
-    // MARK: - viewDidLoad
+    private let alertPresenter = AlertPresenter()
+    
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,10 +35,7 @@ final class MovieQuizViewController: UIViewController {
         
     }
     
-    // MARK: - internal
-    
     func highlightImageBorder(isCorrectAnswer: Bool) {
-        imageView.layer.borderColor = UIColor.clear.cgColor
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
@@ -54,11 +47,8 @@ final class MovieQuizViewController: UIViewController {
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
     }
- 
     
-    // MARK: - Private functions
-    
-    private func show(quiz result: QuizResultViewModel) {
+    func show(quiz result: QuizResultViewModel) {
         let alert = UIAlertController (
             title: result.title,
             message: presenter.makeResultsMessage(),
@@ -75,7 +65,7 @@ final class MovieQuizViewController: UIViewController {
     }
     
     func noBorder() {
-        imageView.layer.borderWidth = 0
+        imageView.layer.borderColor = UIColor.clear.cgColor
     }
     
     func showLoadingIndicator() {
@@ -87,9 +77,6 @@ final class MovieQuizViewController: UIViewController {
         activityIndicator.isHidden = true
         activityIndicator.stopAnimating()
     }
-    
-    
-    
     
     func showNetworkError(message: String) {
         hideLoadingIndicator()
@@ -110,7 +97,7 @@ final class MovieQuizViewController: UIViewController {
         alert.addAction(action)
         self.present(alert, animated: true, completion: nil)
     }
-
+    
     //MARK: - Кнопки
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
@@ -119,7 +106,7 @@ final class MovieQuizViewController: UIViewController {
     }
     
     @IBAction private func noButtonClicked(_ sender: Any) {
-     
+        
         presenter.noButtonClicked()
     }
 }

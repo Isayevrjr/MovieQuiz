@@ -3,10 +3,10 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     
-    
+    var questionFactory: QuestionFactoryProtocol?
     private let statisticService: StatisticServiceProtocol!
     weak var viewController: MovieQuizViewController?
-    var questionFactory: QuestionFactoryProtocol?
+    
     private var currentQuestion: QuizQuestion?
     private let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
@@ -59,6 +59,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     func switchToNextQuestion() {
         currentQuestionIndex += 1
+        viewController?.noBorder()
     }
     
     func didAnswer(isCorrectAnswer: Bool) {
@@ -71,6 +72,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         currentQuestionIndex = 0
         correctAnswers = 0
         questionFactory?.requestNextQuestion()
+        viewController?.noBorder()
     }
     
     func convert(model: QuizQuestion) -> QuizStepViewModel {
@@ -79,37 +81,8 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
     }
-    
- /*   //метод, который содержит логику перехода в один из сценариев
-    func showNextQuestionOrResults() {
-        if self.isLastQuestion() {
-            statisticService?.store(correct: correctAnswers, total: questionsAmount)
-            let bestGame = statisticService?.bestGame
-            let text = """
-                Ваш результат: \(correctAnswers)/\(questionsAmount)
-                Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0)
-                Рекорд: \(bestGame?.correct ?? 0)/\(questionsAmount) (\(String(describing: bestGame?.date.dateTimeString ?? "")))
-                Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? ""))%
-                """
-            let alertModel = AlertModel(
-                title: "Этот раунд окончен!",
-                message: text,
-                buttonText: "Сыграть еще раз",
-                completion: {
-                    self.resetQuestionIndex()
-                    self.correctAnswers = 0
-                    self.questionFactory?.requestNextQuestion()
-                })
-            if let viewController = viewController {
-                viewController.alertPresenter.show(in: viewController, model: alertModel)
-            }
-            correctAnswers = 0
-        } else {
-            switchToNextQuestion()
-            questionFactory?.requestNextQuestion()
-        }
-    } */
-    func showAnswerResult(isCorrect: Bool) {
+
+    private func proceedWithAnswer(isCorrect: Bool) {
         isButtonsEnabled = false
         didAnswer(isCorrectAnswer: isCorrect)
         viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
@@ -119,34 +92,28 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
            // код, который мы хотим вызвать через 1 секунду
             //self.presenter.questionFactory = self.questionFactory
             self.proceedToNextQuestionOrResults()
-            viewController?.noBorder()
             isButtonsEnabled = true
         }
     }
     
-    func proceedToNextQuestionOrResults() {
-           if self.isLastQuestion() {
-               let text = correctAnswers == self.questionsAmount ?
-               "Поздравляем, вы ответили на 10 из 10!" :
-               "Вы ответили на \(correctAnswers) из 10, попробуйте ещё раз!"
-               
-               let alertModel = AlertModel(
-                   title: "Этот раунд окончен!",
-                   message: text,
-                   buttonText: "Сыграть ещё раз",
-                   completion: {
-                       self.resetQuestionIndex()
-                       self.correctAnswers = 0
-                       self.questionFactory?.requestNextQuestion()
-                   })
-               if let viewController = viewController {
-                   viewController.alertPresenter.show(in: viewController, model: alertModel)
-               }
-           } else {
-               self.switchToNextQuestion()
-               questionFactory?.requestNextQuestion()
-           }
-       }
+    private func proceedToNextQuestionOrResults() {
+        if self.isLastQuestion() {
+            let text = correctAnswers == self.questionsAmount ?
+            "Поздравляем, вы ответили на 10 из 10!" :
+            "Вы ответили на \(correctAnswers) из 10, попробуйте ещё раз!"
+            
+            let alertModel = QuizResultViewModel(
+                title: "Этот раунд окончен!",
+                text: text,
+                buttonText: "Сыграть ещё раз")
+            viewController?.show(quiz: alertModel)
+        }
+        else {
+            self.switchToNextQuestion()
+           
+            questionFactory?.requestNextQuestion()
+        }
+    }
     
     func makeResultsMessage() -> String {
         statisticService.store(correct: correctAnswers, total: questionsAmount)
@@ -186,7 +153,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         
         let givenAnswer = isYes
         
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
 }
