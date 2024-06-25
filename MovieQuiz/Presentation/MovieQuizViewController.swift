@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     
     
     //MARK: - Аутлеты
@@ -31,8 +31,6 @@ final class MovieQuizViewController: UIViewController {
         showLoadingIndicator()
         presenter.questionFactory?.loadData()
         
-        presenter.viewController = self
-        
     }
     
     func highlightImageBorder(isCorrectAnswer: Bool) {
@@ -40,7 +38,6 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
     }
-    
     
     func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image

@@ -5,7 +5,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     var questionFactory: QuestionFactoryProtocol?
     private let statisticService: StatisticServiceProtocol!
-    weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewControllerProtocol?
     
     private var currentQuestion: QuizQuestion?
     private let questionsAmount: Int = 10
@@ -13,7 +13,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var correctAnswers = 0
     private var isButtonsEnabled = true
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         
         statisticService = StatisticService()
@@ -47,7 +47,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             self?.viewController?.show(quiz: viewModel)
         }
     }
-    
     
     func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
@@ -132,9 +131,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         
         return resultMessage
     }
-    
-    
-    
     
     // MARK: - Buttons
     
