@@ -43,6 +43,7 @@ final class MovieQuizUITests: XCTestCase {
     
     // MARK: - Тест кнопки "Нет"
     
+    
     func testNoButton() {
         
         sleep(3)
@@ -64,34 +65,37 @@ final class MovieQuizUITests: XCTestCase {
     // MARK: - Тест алерта
     
     func testGameFinish() {
-        sleep(2)
+        
         for _ in 1...10 {
             app.buttons["No"].tap()
             sleep(2)
         }
-
-        let alert = app.alerts["Game results"]
+        sleep(2)
         
-        XCTAssertTrue(alert.exists)
+        let alert = app.alerts["GameResults"]
+        
+        XCTAssertTrue(app.alerts["GameResults"].exists)
         XCTAssertTrue(alert.label == "Этот раунд окончен!")
-        XCTAssertTrue(alert.buttons.firstMatch.label == "Сыграть еще раз")
+        XCTAssertTrue(alert.buttons.firstMatch.label == "Сыграть ещё раз")
     }
 
     func testAlertDismiss() {
-        sleep(2)
+        
         for _ in 1...10 {
-            app.buttons["No"].tap()
             sleep(1)
+            app.buttons["No"].tap()
         }
         
-        let alert = app.alerts["Game results"]
+        sleep(3)
+        
+        let alert = app.alerts["GameResults"]
         alert.buttons.firstMatch.tap()
         
-        sleep(2)
+        sleep(3)
         
         let indexLabel = app.staticTexts["Index"]
         
-        XCTAssertFalse(alert.exists)
+        XCTAssertFalse(app.alerts["GameResults"].exists)
         XCTAssertTrue(indexLabel.label == "1/10")
     }
     

@@ -29,7 +29,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         presenter = MovieQuizPresenter(viewController: self)
         
         showLoadingIndicator()
-        presenter.questionFactory?.loadData()
+        
         
     }
     
@@ -50,7 +50,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
             title: result.title,
             message: presenter.makeResultsMessage(),
             preferredStyle: .alert)
-        
+        alert.view.accessibilityIdentifier = "GameResults"
         let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
             guard let self = self else {return}
             
@@ -82,13 +82,12 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
             title: "Ошибка!",
             message: message,
             preferredStyle: .alert)
-        
         let action = UIAlertAction(title: "Попробовать еще раз",
                                    style: .default) { [weak self] _ in
             guard let self = self else { return }
             
-            
             self.presenter.restartGame()
+            
         }
         
         alert.addAction(action)
